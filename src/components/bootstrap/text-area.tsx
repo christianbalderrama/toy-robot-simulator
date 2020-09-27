@@ -21,6 +21,7 @@ export default function TextArea(props : TextAreaProps) {
         as="textarea"
         onChange={onChange}
         rows={rowCount}
+        required
       />
     </Form.Group>
   );

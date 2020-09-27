@@ -5,18 +5,17 @@ import { faRobot } from '@fortawesome/free-solid-svg-icons'
 
 interface Position {
   x: number,
-  y: number
+  y: number,
 };
 
 interface Props {
   onClick: () => void,
   selected: Position,
   position: Position,
-}
+};
 
 export default function Border(props: Props) {
   const { onClick, selected, position } = props;
-  console.log({selected, position}, selected.x === position.x && selected.y === position.y);
   return (
     <div
       className="item"
@@ -33,10 +32,12 @@ Border.propTypes = {
   onClick: PropTypes.func.isRequired,
   selected: PropTypes.shape({
     x: PropTypes.number.isRequired,
-    y: PropTypes.number.isRequired
+    y: PropTypes.number.isRequired,
+    face: PropTypes.string.isRequired,
   }),
   position: PropTypes.shape({
     x: PropTypes.number.isRequired,
-    y: PropTypes.number.isRequired
+    y: PropTypes.number.isRequired,
+    face: PropTypes.string.isRequired,
   }),
 };
