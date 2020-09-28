@@ -12,35 +12,36 @@ import Border from "./border";
 
 interface IndexProps {};
 
+type Directions = "NORTH" | "SOUTH" | "EAST" | "WEST";
+
 interface Position {
   x: number,
   y: number,
-  face: string,
+  face: Directions,
 };
 
 export default function Index(props: IndexProps) {
   const {} = props;
-  const [error, setError] = useState(false);
-  const [action, setAction] = useState("");
+
+  const [success, showSuccess] = useState<boolean>(false);
+  const [error, showError] = useState<boolean>(false);
+  const [action, setAction] = useState<string>("");
   const [position, setPosition] = useState<Position>({
     x: 0,
     y: 0,
     face: "NORTH",
   });
 
-  function renderTable(): JSX.Element[] {
+  function renderTable() : JSX.Element[] {
     let grid = [];
-    for (let row = 4; row >= 0; row--) {
-      for (let col = 4; col >= 0; col--) {
+    for (let y = 4; y >= 0; y--) {
+      for (let x = 0; x < 5; x++) {
         grid.push(
           <Border
-            selected={position}
-            position={{
-              x: row,
-              y: col,
-            }}
             key={uuidv4()}
-            onClick={() => console.log("HEY >>> ", {row, col})}
+            selected={position}
+            position={{x, y}}
+            onClick={() => console.log("GRID POSITION >>> ", {x, y})}
           />
         );
       }
@@ -50,21 +51,19 @@ export default function Index(props: IndexProps) {
     return grid;
   }
 
-  function evaluateCommand(action : string) : void | string {
+  function evaluateCommand(action : string) : void {
     switch (action.split(" ")[0]) {
       case "PLACE":
         const [delX, delY, delZ] = action.split(" ")[1].split(",");
         return setPosition({
           x: parseInt(delX),
           y: parseInt(delY),
-          face: delZ,
+          face: delZ as Directions,
         });
       case "MOVE":
         let x : number = position.x;
         let y : number = position.y;
-        let face : string = position.face;
-
-        switch (face) {
+        switch (position.face) {
           case "NORTH":
             y = y + 1;
             break;
@@ -72,32 +71,26 @@ export default function Index(props: IndexProps) {
             y = y - 1;
             break;
           case "EAST":
-            x = x - 1;
+            x = x + 1;
             break;
           case "WEST":
-            x = x + 1;
+            x = x - 1;
             break;
         };
 
-        console.log("MOVE >>> ", {x, y, face});
-
-        return setPosition({
-          x,
-          y,
-          face,
-        });
+        return setPosition({x, y, face: position.face});
       case "REPORT":
-        return console.log("POSITION >>> ", position);
+        return showSuccess(true);
     };
   }
 
-  function handleSubmit(e : FormEvent<HTMLElement>) : void {
+  function handleSubmit(e : FormEvent<HTMLElement>) : JSX.Element[] | void {
     e.preventDefault();
     const actionArr = action.split("\n");
     const firstCommand = actionArr[0].split(" ");
 
     if (firstCommand[0] !== "PLACE") {
-      return setError(true);
+      return showError(true);
     } else {
       actionArr.map((action : string) => evaluateCommand(action));
     }
@@ -105,6 +98,17 @@ export default function Index(props: IndexProps) {
 
   return (
     <Container>
+      {success && (
+        <Alert dismissible variant="success" onClose={() => {
+          showSuccess(false);
+          return setAction("");
+        }}>
+          <h3>{"Final Position"}</h3>
+          <h5>{`X: ${position.x}`}</h5>
+          <h5>{`Y: ${position.y}`}</h5>
+          <h5>{`Face: ${position.face}`}</h5>
+        </Alert>
+      )}
       <Row>
         <Col>
           <div className="grid">
@@ -117,6 +121,7 @@ export default function Index(props: IndexProps) {
           <Form onSubmit={handleSubmit}>
             <TextArea
               onChange={(e) => setAction(e.target.value)}
+              value={action}
               placeholder="Enter your actions here ..."
               rowCount={3}
               label="Actions"
@@ -125,7 +130,7 @@ export default function Index(props: IndexProps) {
               <Alert
                 dismissible
                 variant="danger"
-                onClose={() => setError(false)}>
+                onClose={() => showError(false)}>
                 <p>{"Invalid Command"}</p>
               </Alert>
             )}

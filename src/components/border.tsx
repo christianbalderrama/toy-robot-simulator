@@ -33,11 +33,9 @@ Border.propTypes = {
   selected: PropTypes.shape({
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired,
-    face: PropTypes.string.isRequired,
   }),
   position: PropTypes.shape({
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired,
-    face: PropTypes.string.isRequired,
   }),
 };

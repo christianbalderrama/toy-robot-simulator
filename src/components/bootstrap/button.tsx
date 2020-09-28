@@ -9,10 +9,10 @@ interface ButtonProps {
 };
 
 export default function Wrapper(props: ButtonProps) : JSX.Element {
-  const { label, type, variant } = props;
+  const { label, type, variant = "primary" } = props;
   return (
     <Button
-      variant={variant || "primary"}
+      variant={variant}
       type={type}>
       {label}
     </Button>

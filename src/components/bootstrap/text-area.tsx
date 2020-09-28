@@ -6,11 +6,12 @@ interface TextAreaProps {
   label: string,
   rowCount: number,
   placeholder: string,
+  value: string,
   onChange: (e : ChangeEvent<any>) => void,
 };
 
 export default function TextArea(props : TextAreaProps) {
-  const { onChange, label, placeholder = "lorem ipsum", rowCount = 3} = props;
+  const { value, onChange, label, placeholder = "lorem ipsum", rowCount = 3} = props;
   return (
     <Form.Group>
       <Form.Label>
@@ -19,6 +20,7 @@ export default function TextArea(props : TextAreaProps) {
       <Form.Control
         placeholder={placeholder}
         as="textarea"
+        value={value}
         onChange={onChange}
         rows={rowCount}
         required
@@ -31,5 +33,6 @@ TextArea.propTypes = {
   label: PropTypes.string.isRequired,
   rowCount: PropTypes.number,
   placeholder: PropTypes.string,
+  value: PropTypes.string,
   onChange: PropTypes.func.isRequired,
 };
