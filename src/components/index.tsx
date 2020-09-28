@@ -1,4 +1,4 @@
-import React, {useState, FormEvent} from "react";
+import React, {useState, useEffect, FormEvent} from "react";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -25,12 +25,21 @@ export default function Index(props: IndexProps) {
 
   const [success, showSuccess] = useState<boolean>(false);
   const [error, showError] = useState<boolean>(false);
-  const [action, setAction] = useState<string>("");
+  const [actionArr, setActionArr] = useState<string[]>([]);
+  const [action, setAction] = useState("");
   const [position, setPosition] = useState<Position>({
     x: 0,
     y: 0,
     face: "NORTH",
   });
+
+  useEffect(() => {
+    if (actionArr.length > 0) {
+      const [action, ...actions] = actionArr;
+      evaluateCommand(action);
+      return setActionArr(actions);
+    }
+  }, [actionArr]);
 
   function renderTable() : JSX.Element[] {
     let grid = [];
@@ -84,7 +93,7 @@ export default function Index(props: IndexProps) {
     };
   }
 
-  function handleSubmit(e : FormEvent<HTMLElement>) : JSX.Element[] | void {
+  function handleSubmit(e : FormEvent<HTMLElement>) : void {
     e.preventDefault();
     const actionArr = action.split("\n");
     const firstCommand = actionArr[0].split(" ");
@@ -92,7 +101,7 @@ export default function Index(props: IndexProps) {
     if (firstCommand[0] !== "PLACE") {
       return showError(true);
     } else {
-      actionArr.map((action : string) => evaluateCommand(action));
+      return setActionArr(actionArr);
     }
   }
 
@@ -118,7 +127,7 @@ export default function Index(props: IndexProps) {
       </Row>
       <Row>
         <Col>
-          <Form onSubmit={handleSubmit}>
+          <Form onSubmit={(e : FormEvent<HTMLElement>) => handleSubmit(e)}>
             <TextArea
               onChange={(e) => setAction(e.target.value)}
               value={action}
