@@ -60,15 +60,86 @@ export default function Index(props: IndexProps) {
     return grid;
   }
 
+  function checkCoordinates(x : number, y : number) : boolean {
+    if (y > 4 || y < 0 || x > 4 || x < 0) {
+      console.log("INVALID >>> ", {x, y});
+      return false;
+    }
+
+    console.log("VALID >>> ", {x, y});
+    return true;
+  }
+
+  function getDirectionByValue(value : number) : Directions {
+    let direction : string = "";
+    switch (value) {
+      case 0:
+      case 360:
+        direction = "NORTH";
+        break;
+      case 270:
+        direction = "WEST";
+        break;
+      case 180:
+        direction = "SOUTH";
+        break;
+      case 90:
+        direction = "EAST";
+        break;
+    };
+
+    return direction as Directions;
+  }
+
+  function getValueByDirection(direction : string) : number {
+    let value : number = 0;
+    switch (direction) {
+      case "NORTH":
+        value = 360;
+        break;
+      case "WEST":
+        value = 270;
+        break;
+      case "SOUTH":
+        value = 180;
+        break;
+      case "EAST":
+        value = 90;
+        break;
+    };
+
+    return value;
+  }
+
+  function getFace(face : string) : void {
+    let value : number = getValueByDirection(position.face);
+    switch (face) {
+      case "LEFT":
+        value -= 90;
+        break;
+      case "RIGHT":
+        value += 90;
+        break;
+    };
+
+    const newFace = getDirectionByValue(value);
+    return setPosition({...position, face: newFace});
+  }
+
   function evaluateCommand(action : string) : void {
     switch (action.split(" ")[0]) {
       case "PLACE":
         const [delX, delY, delZ] = action.split(" ")[1].split(",");
-        return setPosition({
-          x: parseInt(delX),
-          y: parseInt(delY),
-          face: delZ as Directions,
-        });
+        const isValidCoordinates = checkCoordinates(parseInt(delX), parseInt(delY));
+        if (isValidCoordinates) {
+          return setPosition({
+            x: parseInt(delX),
+            y: parseInt(delY),
+            face: delZ as Directions,
+          });
+        }
+
+        return;
       case "MOVE":
         let x : number = position.x;
         let y : number = position.y;
@@ -87,7 +158,16 @@ export default function Index(props: IndexProps) {
             break;
         };
 
-        return setPosition({x, y, face: position.face});
+        const valid = checkCoordinates(x, y);
+        if (valid) {
+          return setPosition({x, y, face: position.face});
+        }
+
+        return;
+      case "LEFT":
+        return getFace("LEFT");
+      case "RIGHT":
+        return getFace("RIGHT");
       case "REPORT":
         return showSuccess(true);
     };
